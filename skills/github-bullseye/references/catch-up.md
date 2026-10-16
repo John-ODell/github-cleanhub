@@ -27,10 +27,10 @@ one. Work the largest gaps, with these levers and only these.
   shipped: does it still hold, did anything regress, is there a test
   missing. Those reviews produce findings, and the findings produce issues,
   which fixes two slices at once.
-- Whether reviews on already-merged PRs count is unverified (see
-  `what-counts.md`). Do one, wait a day, check the profile, record the
-  answer. If they do not count, reviews can only come from new PRs, and the
-  catch-up is to split upcoming work into smaller units.
+- Reviews on already-merged PRs count (verified 2026-10-16, see
+  `what-counts.md`), so this lever is real. A second review on a PR you
+  already reviewed counts nothing extra, so pick PRs with no review by you:
+  the `-reviewed-by:LOGIN` filter above does that.
 
 ## If issues are behind
 
