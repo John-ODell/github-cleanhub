@@ -52,8 +52,10 @@ open after its PR merged, is unfinished work.
 - Never commit straight to the default branch. Branch and PR, always.
 - Squash merge only. A merge commit or rebase merge lands every branch
   commit on the default branch and floods the commits slice.
-- One review per PR is the floor. Reviewing a PR twice is fine when there is
-  a real second pass to write up, but do not stack reviews to pad the count.
+- One review per PR is the floor, and also the ceiling for the count:
+  GitHub keeps the most recent review per PR, so a second review on the
+  same PR adds nothing (verified 2026-10-16, see `references/what-counts.md`).
+  Write a second pass when there is a real one; expect nothing for it.
 - The commit author must be the account's git identity with an email linked
   to the GitHub account, or the squash commit does not count for anyone.
   Check with `git log -1 --format=%ae` on the default branch after merging.
@@ -88,6 +90,25 @@ on one PR, wait a day for the profile to update, and record the result there.
 ## Lessons learned
 
 Newest first. Add a dated line when a run teaches something.
+
+- 2026-10-16: Reviews on already merged PRs count. A comment review on
+  pocket-chance PR 9 (merged twelve days earlier) showed up as a review
+  contribution within a minute. Reviewing the 159 merged PRs John never
+  reviewed is a real lever for the Code review slice, and the findings
+  those reviews turn up are real issues: the two test reviews produced
+  three.
+- 2026-10-16: A second review on the same PR does not count again. GitHub
+  keeps the most recent review per PR; the second review on
+  freeciv-macos27 PR 2 replaced the first in the contributions collection
+  and left the total unchanged. One review per PR is all the radar sees.
+- 2026-10-16: `gh pr merge --squash` authors the squash commit with the
+  account's `users.noreply.github.com` address, and that commit counts
+  (github-cleanhub PR 2). The `.local` problem is only for commits made by
+  a local git with a bad `user.email`.
+- 2026-10-16: The radar rounds to whole percents, so at this account's
+  ~880 contributions one review or one issue is invisible there. Test a
+  rule on a public PR and read GraphQL `contributionsCollection`, which is
+  exact and immediate; read the radar for the shape only.
 
 - 2026-10-16: This repo's first two commits were authored as
   `johnodell@Johns-MacBook-Pro.local`, a machine-generated address GitHub

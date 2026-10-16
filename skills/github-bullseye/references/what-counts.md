@@ -10,7 +10,9 @@ Sources: GitHub Docs, "What counts as a contribution"
 (docs.github.com/en/account-and-profile/reference/profile-contributions-reference)
 and "Why are my contributions not showing up on my profile". Verified lines
 were checked on 2026-10-16 against the REST search API and the radar on
-John's profile (61% commits, 25% PRs, 9% issues, 5% review).
+John's profile (61% commits, 25% PRs, 9% issues, 5% review). The two Code
+review tests the same day also used GraphQL `contributionsCollection` and
+the profile's activity feed; the method is under "Measuring" below.
 
 ## Commits
 
@@ -23,6 +25,12 @@ John's profile (61% commits, 25% PRs, 9% issues, 5% review).
   a merge commit or rebase merge adds every commit on the branch. (Docs for
   the first part; verified for squash: pocket-chance has 64 PRs and 64
   commits in the window.)
+- A squash merge made with `gh pr merge --squash` is authored as the
+  account's `ID+LOGIN@users.noreply.github.com` address, and it counts.
+  (Verified 2026-10-16: github-cleanhub `c782fea` is authored
+  `149541420+John-ODell@users.noreply.github.com`, the API resolves its
+  author to John-ODell, and `search/commits?q=repo:John-ODell/github-cleanhub+author:John-ODell`
+  returns that one commit and neither of the two `.local` ones.)
 - Can take **up to 24 hours** to appear on the profile. (Docs.)
 - Counted by author date, so backdated commits land in the past. Do not do
   that; it is noise, and it is the kind of thing that gets a profile flagged.
@@ -57,13 +65,26 @@ John's profile (61% commits, 25% PRs, 9% issues, 5% review).
   changes on their own PR, but a Comment review submits fine. (Verified
   2026-10-16: all 42 PRs John had reviewed were his own, and the radar's 5%
   matches 42 of 865.)
-- Whether a **second review on the same PR** counts again is unverified.
-  website PR 39 has two comment reviews by John, and the radar could not
-  tell 42 from 43. Assume one per PR when planning; do not stack reviews to
-  find out.
-- Whether a review on an **already merged or closed PR** counts is
-  unverified. GitHub lets you submit one. Test on one old PR, wait a day,
-  and record the answer here before relying on it for catch-up.
+- **A review on an already merged PR counts.** (Verified 2026-10-16: a
+  comment review on pocket-chance PR 9, merged 2026-10-04 and never
+  reviewed, appeared within a minute as a node in GraphQL
+  `contributionsCollection.pullRequestReviewContributions`, moved
+  `totalPullRequestReviewContributions` from 1 to 2, and moved
+  `bullseye.sh` code_review from 44 to 45; the profile's public "Reviewed
+  N pull requests" line read 2 afterwards (only GraphQL was read before). The radar read 5% before and
+  after: 45 of 884 still rounds to 5%, so the radar cannot show one
+  review. Radar re-read after 24 hours: pending, see SKILL.md lessons.)
+- **A second review on the same PR does not count again.** (Disproved
+  2026-10-16: a second comment review on freeciv-macos27 PR 2, which
+  already had one review that was the account's only public review node,
+  left the total at 2 rather than 3. The old node was replaced by the new
+  one and its `occurredAt` moved to the new review's time. GitHub's schema
+  says so outright: `pullRequestReviewContributions` "Returns the most
+  recently submitted review for each PR reviewed by the user".) So the
+  Code review slice counts **PRs reviewed**, which is exactly what the
+  `reviewed-by:` search counts. A second review re-dates a PR's one
+  contribution; it never adds one. Do a second pass when there is a real
+  one to write up, and expect nothing from it on the radar.
 
 ## Things that silently count for nothing
 
@@ -96,3 +117,18 @@ search/commits?q=author:LOGIN+author-date:>=DATE          -> commits
 Search allows 30 requests a minute. The commits search returns commits on
 every branch, so it slightly overcounts when there are unmerged branches;
 on this account it matched the radar within rounding.
+
+For a **public** repo, GraphQL is the exact instrument and updates within a
+minute, which the radar's whole-percent rounding never will:
+
+```
+gh api graphql -f query='{ viewer { contributionsCollection {
+  totalPullRequestReviewContributions
+  pullRequestReviewContributions(first: 20, orderBy: {direction: DESC}) {
+    nodes { occurredAt pullRequest { number repository { nameWithOwner } } } } } } }'
+```
+
+One node per PR reviewed (the most recent review), none for private repos.
+Use it to test a rule on a public PR; use the search counts and the radar
+for the whole picture. The profile's "Reviewed N pull requests in M
+repositories" line (logged out, so public only) shows the same number.
