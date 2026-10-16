@@ -69,9 +69,9 @@ the profile's activity feed; the method is under "Measuring" below.
   comment review on pocket-chance PR 9, merged 2026-10-04 and never
   reviewed, appeared within a minute as a node in GraphQL
   `contributionsCollection.pullRequestReviewContributions`, moved
-  `totalPullRequestReviewContributions` from 1 to 2, moved the profile's
-  public "Reviewed N pull requests" line from 1 to 2, and moved
-  `bullseye.sh` code_review from 44 to 45. The radar read 5% before and
+  `totalPullRequestReviewContributions` from 1 to 2, and moved
+  `bullseye.sh` code_review from 44 to 45; the profile's public "Reviewed
+  N pull requests" line read 2 afterwards (only GraphQL was read before). The radar read 5% before and
   after: 45 of 884 still rounds to 5%, so the radar cannot show one
   review. Radar re-read after 24 hours: pending, see SKILL.md lessons.)
 - **A second review on the same PR does not count again.** (Disproved
