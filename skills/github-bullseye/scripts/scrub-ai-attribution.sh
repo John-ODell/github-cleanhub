@@ -61,14 +61,19 @@ case "$cmd" in
   audit)
     rm -rf "$mirror" "$mirror.before" "$mirror.after"; mkdir -p "$SCRUB_DIR"
     git clone -q --bare "git@github.com:${repo}.git" "$mirror"
-    cd "$mirror"; echo "$repo"; report before
+    cd "$mirror"; git ls-remote --heads --tags origin > "$mirror.remote-at-audit"
+    echo "$repo"; report before
     ;;
   rewrite)
     [ -d "$mirror" ] || { echo "run audit first (no mirror at $mirror)" >&2; exit 1; }
     cd "$mirror"; echo "$repo"; report before
     fingerprint > "$mirror.before"
     export FILTER_BRANCH_SQUELCH_WARNING=1
-    git filter-branch -f --msg-filter "$msg_filter" --env-filter "$env_filter" -- --branches --tags >/dev/null
+    # Full refnames, not --branches --tags: a branch and a tag with the same
+    # name make the short name ambiguous and filter-branch then skips both.
+    # shellcheck disable=SC2046
+    git filter-branch -f --tag-name-filter cat --msg-filter "$msg_filter" --env-filter "$env_filter" \
+      -- $(git for-each-ref --format='%(refname)' refs/heads refs/tags) >/dev/null
     git for-each-ref --format='%(refname)' refs/original/ | while read -r ref; do git update-ref -d "$ref"; done
     git reflog expire --expire=now --all && git gc -q --prune=now
     fingerprint > "$mirror.after"
@@ -82,14 +87,35 @@ case "$cmd" in
   push)
     [ -d "$mirror" ] && [ -f "$mirror.after" ] || { echo "run rewrite first" >&2; exit 1; }
     cd "$mirror"; echo "$repo"; report mirror
+    # Refuse if anything was pushed to GitHub since the audit: the mirror
+    # would overwrite it. Re-run audit and rewrite instead.
+    if ! git ls-remote --heads --tags origin | cmp -s - "$mirror.remote-at-audit"; then
+      echo "  STOP: $repo changed on GitHub since the audit (a session pushed). Refs that differ:"
+      diff <(sort "$mirror.remote-at-audit") <(git ls-remote --heads --tags origin | sort) | grep '^[<>]' | head
+      echo "  Stop that session, then run audit and rewrite again."; exit 1
+    fi
+    # Fetch GitHub's current heads into refs/remotes/origin/* (never into
+    # refs/heads/*, which hold the rewrite) so the push can send a thin pack
+    # of just the new commits. Without this, after gc the mirror lacks the
+    # old commits, cannot see what GitHub already has, and sends every blob;
+    # a 2 GiB repo then hits GitHub's pack limit.
+    git fetch -q origin '+refs/heads/*:refs/remotes/origin/*'
     echo "  This replaces every branch and tag of $repo on GitHub with the rewritten history."
     echo "  Every other clone must then run:  git fetch origin && git reset --hard origin/<branch>"
     if [ "${YES:-0}" != 1 ]; then
       read -r -p "  Type the repo name to continue: " ans
       [ "$ans" = "${repo#*/}" ] || { echo "aborted"; exit 1; }
     fi
-    git push -q --force --all origin && git push -q --force --tags origin
-    echo "  pushed. GitHub recomputes the Contributors graph in the background; allow a few minutes."
+    # Lease every ref on the value it had at audit time: GitHub rejects the
+    # push atomically if a session moved any of them since, even in the
+    # moment between the check above and the push.
+    leases=()
+    while read -r sha ref; do leases+=("--force-with-lease=${ref}:${sha}"); done < "$mirror.remote-at-audit"
+    if git push -q --atomic "${leases[@]}" origin 'refs/heads/*:refs/heads/*' 'refs/tags/*:refs/tags/*'; then
+      echo "  pushed. GitHub recomputes the Contributors graph in the background; allow a few minutes."
+    else
+      echo "  PUSH REJECTED: nothing on GitHub was changed. Run audit and rewrite again, then push."; exit 1
+    fi
     ;;
   *) echo "unknown command: $cmd" >&2; exit 2 ;;
 esac
