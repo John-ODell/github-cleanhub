@@ -22,6 +22,13 @@ A unit of work is one thing a person could describe in a sentence: a fix, a
 feature slice, a doc page, a refactor. Big tasks become several units, each
 with its own four.
 
+**Claude does all four itself, in John's name.** The issue, the pull
+request, the review and the merge are written and submitted by the session
+through John's `gh` login, which is why they count on his profile. "No AI
+attribution" (below) means no credit lines and no Claude identity on any
+of them; it never means skipping the issue or the review. Opening the
+issue and writing the review are the work, not optional extras.
+
 ## The recipe
 
 Exact commands and flags are in `references/recipe.md`. The shape:
