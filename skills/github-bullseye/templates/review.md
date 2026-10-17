@@ -9,6 +9,10 @@
   each **fixed here**, **issue #M**, or **nit**.
 - Or: "None." when that is true after a real read.
 
+## Record
+
+- No AI attribution in the branch's commits or the PR body (checked / fixed).
+
 ## Not verified
 
 - Anything the review could not run or confirm.

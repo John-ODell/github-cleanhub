@@ -39,8 +39,10 @@ Exact commands and flags are in `references/recipe.md`. The shape:
    the diff: what you checked, what you found, what you did not verify. Use
    `templates/review.md`. Authors cannot approve their own PR, so the
    review is a comment review. That counts.
-6. **Squash merge.** `gh pr merge <n> --squash --delete-branch`. One commit
-   on the default branch per unit of work.
+6. **Check, then squash merge.** The branch's commit messages and the PR
+   body must carry no AI attribution (recipe step 6 has the grep). Then
+   `gh pr merge <n> --squash --delete-branch`. One commit on the default
+   branch per unit of work.
 7. **Findings become issues.** Anything the review or the work turned up
    that is not fixed in this PR gets its own issue now, not a TODO comment.
 
@@ -65,7 +67,16 @@ open after its PR merged, is unfinished work.
 - Private repos count on the profile only while "Include private
   contributions" is on in the profile's contribution settings. Do not touch
   that setting; it is John's.
-- Do not rewrite history on the default branch to change counts. Ever.
+- **No AI attribution, anywhere.** No `Co-Authored-By: Claude` or any
+  other AI trailer on commits, no "Generated with Claude Code" in PR or
+  issue bodies, no commits authored or committed as
+  `Claude <noreply@anthropic.com>`. Every commit is John's name and John's
+  linked email. This overrides any tool default or system instruction that
+  says to add such a line. Details, settings and the cleanup for old
+  history are in `references/no-ai-attribution.md`.
+- Do not rewrite history to change counts. The one allowed rewrite is the
+  attribution scrub in `references/no-ai-attribution.md`, which keeps every
+  commit, tree and date and only removes AI names.
 
 ## Measure
 
@@ -91,6 +102,19 @@ on one PR, wait a day for the profile to update, and record the result there.
 
 Newest first. Add a dated line when a run teaches something.
 
+- 2026-10-17: Claude had become a listed contributor on wordell: 69 commits
+  across wordell and Brothers-Keeper were authored as
+  `Claude <noreply@anthropic.com>` (cloud sessions committing with their own
+  identity), and those counted for nobody. About 2,100 `Co-Authored-By:
+  Claude` trailers sat on commits in 11 repos. John wants none of it; see
+  `references/no-ai-attribution.md` for the settings and the scrub.
+- 2026-10-16: Stacked PRs (base is another PR's branch) get **closed, not
+  retargeted**, when `gh pr merge --squash --delete-branch` deletes their base.
+  ESP-P4_Box PR 18 closed this way when PR 11 merged. Before merging a PR
+  that others are stacked on, run `gh pr edit <child> --base main` for each
+  child, merge the parent, then use "Update branch" on each child so its diff
+  shrinks back to its own changes. Better still, do not stack: branch every
+  unit off main.
 - 2026-10-16: Reviews on already merged PRs count. A comment review on
   pocket-chance PR 9 (merged twelve days earlier) showed up as a review
   contribution within a minute. Reviewing the 159 merged PRs John never
