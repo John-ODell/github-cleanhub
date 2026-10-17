@@ -91,6 +91,15 @@ The short version: the lever for commits is squash merging, the lever for
 reviews is a real pass over every unreviewed PR in the last year, and the
 lever for issues is writing down every finding those reviews produce.
 
+## New repos
+
+Before the first commit in a new repo, follow `references/new-project.md`:
+create it squash-only, run `scripts/install.sh --project` so the skill,
+the attribution-off setting and the rule in `CLAUDE.md` and `AGENTS.md`
+are committed with it, check the git identity, and make the first PR a
+full unit of work. After the first merge, `scripts/contributors.sh` must
+list John alone on every repo.
+
 ## What counts
 
 `references/what-counts.md` is the source of truth for what GitHub counts in
