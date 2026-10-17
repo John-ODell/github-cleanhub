@@ -76,7 +76,22 @@ issue (step 7) and link it from the review.
 A review with nothing in it but "LGTM" is not a review. Say at least one
 concrete thing you checked.
 
-## 6. Squash merge
+## 6. Check for attribution, then squash merge
+
+Nothing in the branch or the PR may name an AI as author, co-author or
+session:
+
+```bash
+git log --format=%B origin/main..HEAD | grep -iE 'co-authored-by|generated with|claude-session'   # want nothing
+git log --format='%ae %ce' origin/main..HEAD | grep -v "$(git config user.email)"                  # want nothing
+gh pr view P --json body --jq .body | grep -iE 'generated with|co-authored'                        # want nothing
+```
+
+If a trailer slipped in, fix it before merging: `git commit --amend` on the
+last commit, or `git rebase -i` on the branch (branch commits are not on
+GitHub's record yet, so rewriting them is fine). Edit the PR body with
+`gh pr edit P --body-file pr.md`. The squash commit message is built from
+the PR title and body, so a clean body gives a clean commit.
 
 ```bash
 gh pr merge P --squash --delete-branch
