@@ -82,10 +82,14 @@ Nothing in the branch or the PR may name an AI as author, co-author or
 session:
 
 ```bash
-git log --format=%B origin/main..HEAD | grep -iE 'co-authored-by|generated with|claude-session'   # want nothing
-git log --format='%ae %ce' origin/main..HEAD | grep -v "$(git config user.email)"                  # want nothing
-gh pr view P --json body --jq .body | grep -iE 'generated with|co-authored'                        # want nothing
+AI='^\s*(co-authored-by:.*(claude|anthropic)|.*generated with \[?claude code|claude-session:)'
+git log --format=%B origin/main..HEAD | grep -iE "$AI"                              # want nothing
+git log --format='%ae %ce' origin/main..HEAD | grep -v "$(git config user.email)"   # want nothing
+gh pr view P --json body --jq .body | grep -iE "$AI"                                # want nothing
 ```
+
+The pattern is anchored to trailer lines on purpose: prose that mentions
+the words (a PR about this very check, say) is not attribution.
 
 If a trailer slipped in, fix it before merging: `git commit --amend` on the
 last commit, or `git rebase -i` on the branch (branch commits are not on
