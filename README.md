@@ -44,7 +44,10 @@ Pick whichever fits the moment. The content is the same.
 | [references/recipe.md](skills/github-bullseye/references/recipe.md) | The exact `gh` commands for issue, branch, PR, review, squash merge. |
 | [references/catch-up.md](skills/github-bullseye/references/catch-up.md) | How to pull a lopsided radar back to even without inventing work. |
 | [scripts/bullseye.sh](skills/github-bullseye/scripts/bullseye.sh) | Measures the four counts for the last year and says what is behind. |
-| [scripts/install.sh](skills/github-bullseye/scripts/install.sh) | Links the skill into Claude's and Codex's skill folders. |
+| [scripts/install.sh](skills/github-bullseye/scripts/install.sh) | Links the skill into Claude's and Codex's skill folders and turns AI attribution off. |
+| [scripts/contributors.sh](skills/github-bullseye/scripts/contributors.sh) | Every repo's Contributors list; flags any login but John's and any AI attribution left in recent commits. |
+| [references/new-project.md](skills/github-bullseye/references/new-project.md) | The ten-minute setup for a new repo so it starts clean. |
+| [references/no-ai-attribution.md](skills/github-bullseye/references/no-ai-attribution.md) | No Claude trailers, footers or authorship anywhere; the settings and the scrub for old history. |
 | [templates/](skills/github-bullseye/templates/) | Short issue, PR and review bodies. |
 
 `CLAUDE.md` and `AGENTS.md` at the root make this repo itself load the skill
