@@ -14,6 +14,7 @@ hashes change, so **every clone of a rewritten repo must be reset once.**
 | Repo | Clones on this Mac that still need the reset below |
 | --- | --- |
 | Brothers-Keeper | `~/Desktop/final_finasty_game`, `~/Desktop/final_finasty_game_art` |
+| Brothers-Keeper-Art | `~/Desktop/asset_generator` |
 | website | `~/Desktop/website` and its four worktrees under `~/Desktop/website/.claude/worktrees/` |
 | ESP-P4_Box | `~/Desktop/ESP-P4_Box`, and any clone the ESP32 P4 session uses |
 | freeciv-macos27 | `~/Desktop/freeciv-port`, and any clone the Freeciv session uses |
@@ -51,20 +52,12 @@ git log --format=%B | grep -ciE 'co-authored-by:.*claude|^claude-session:'   # m
 **Do not push from a clone that has not been reset.** A push from old
 history re-introduces the old commits.
 
-## Still to do: Brothers-Keeper-Art
+## History: all 11 repos done
 
-Rewritten and verified twice (89 commits, 66 trailer lines removed), but a
-live session pushed to it during both attempts and the push was rejected
-by the lease, so nothing changed on GitHub. When that session is idle:
-
-```bash
-S=~/Desktop/github-cleanhub/skills/github-bullseye/scripts/scrub-ai-attribution.sh
-$S audit   John-ODell/Brothers-Keeper-Art     # fresh mirror (about 2 GB, takes a few minutes)
-$S rewrite John-ODell/Brothers-Keeper-Art     # verifies dates and trees match
-$S push    John-ODell/Brothers-Keeper-Art     # asks for the repo name; rejected if GitHub moved since audit
-```
-
-Then reset `~/Desktop/asset_generator` with the command above.
+Brothers-Keeper-Art was the last, pushed 2026-10-17 once its live session
+paused (91 commits, 66 trailer lines removed). `scripts/contributors.sh
+--all` now reports every repo John owns as clean: only `John-ODell` in each
+Contributors list, no AI-authored commits, no attribution lines.
 
 ## PR and issue bodies: done
 
