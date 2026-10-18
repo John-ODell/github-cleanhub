@@ -10,7 +10,10 @@
 #        install.sh --uninstall     remove the user-level links
 set -euo pipefail
 
-here="$(cd "$(dirname "$0")/.." && pwd)"   # the skill folder
+# The skill folder, with symlinks resolved. Run through an installed link
+# (~/.claude/skills/<name>/scripts/install.sh), plain pwd would give the link's
+# own path and ln -sfn would point the link at itself.
+here="$(cd -P "$(dirname "$0")/.." && pwd -P)"
 name="$(basename "$here")"
 project=""
 uninstall=0
@@ -26,7 +29,9 @@ done
 
 link() { # link <skills-dir>
   mkdir -p "$1"
-  if [ -L "$1/$name" ] || [ ! -e "$1/$name" ]; then
+  if [ "$(cd -P "$1" && pwd -P)/$name" = "$here" ]; then
+    echo "skipped $1/$name (that is the skill folder itself)" >&2
+  elif [ -L "$1/$name" ] || [ ! -e "$1/$name" ]; then
     ln -sfn "$here" "$1/$name"
     echo "linked  $1/$name -> $here"
   else
