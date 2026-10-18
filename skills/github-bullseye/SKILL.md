@@ -118,6 +118,12 @@ on one PR, wait a day for the profile to update, and record the result there.
 
 Newest first. Add a dated line when a run teaches something.
 
+- 2026-10-18: `install.sh --project`, run as
+  `~/.claude/skills/github-bullseye/scripts/install.sh`, pointed the
+  user-level links at themselves: plain `pwd` kept the symlinked path. The
+  script now resolves its real folder with `pwd -P` and skips any link that
+  would be the skill folder itself. Re-running it from the github-cleanhub
+  checkout repairs a self-link.
 - 2026-10-17: Claude had become a listed contributor on wordell: 69 commits
   across wordell and Brothers-Keeper were authored as
   `Claude <noreply@anthropic.com>` (cloud sessions committing with their own
