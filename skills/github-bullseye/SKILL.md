@@ -54,7 +54,37 @@ Exact commands and flags are in `references/recipe.md`. The shape:
    that is not fixed in this PR gets its own issue now, not a TODO comment.
 
 Do all seven in the same session. A PR without a review, or an issue left
-open after its PR merged, is unfinished work.
+open after its PR merged, is unfinished work. **The merge is the session's
+job too.** Do not hand a reviewed PR back to John to merge; he has said
+sessions merge, in his name, by these rules. If Claude Code's auto-mode
+safety check refuses `gh pr merge` as "self-approval", the fix is a
+permission rule in John's settings, not a message to John: see "Permission
+for the merge" below. Until the rule is in place, report the blocked PR
+numbers in one line and carry on with the next unit; never stop and wait.
+
+## Permission for the merge
+
+Claude Code's auto-mode classifier sometimes refuses to let a session merge
+a PR it opened. The skill cannot grant that permission (a session is not
+allowed to edit its own permissions), so John adds it once, in
+`~/.claude/settings.json`, next to `attribution`:
+
+```json
+"permissions": {
+  "allow": [
+    "Bash(gh pr merge:*)",
+    "Bash(gh pr review:*)",
+    "Bash(gh pr create:*)",
+    "Bash(gh pr edit:*)",
+    "Bash(gh issue create:*)",
+    "Bash(gh issue edit:*)"
+  ]
+}
+```
+
+The same block in a repo's `.claude/settings.json` covers cloud sessions
+and other machines. `install.sh` does not write it, for the same reason a
+session cannot.
 
 ## Standing rules
 
